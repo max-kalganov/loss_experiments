@@ -9,8 +9,7 @@ def lin_key_function(x1, x2, w1, w2):
 
 
 @gin.configurable()
-def get_dataset(w1: float = 0.1, w2: float = -0.7,
-                samples_num: int = 100,
+def get_dataset(w1: float, w2: float, samples_num: int,
                 key: Optional[Callable] = None) -> Tuple[np.ndarray, np.ndarray]:
     key = key if key is not None else lin_key_function
 

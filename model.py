@@ -4,12 +4,10 @@ import gin
 
 
 @gin.configurable()
-def get_model(optimizer=tf.keras.optimizers.SGD(),
-              loss=tf.keras.losses.BinaryCrossEntropy(),
-              metric=tf.keras.metrics.BinaryAccuracy()):
-    input = tf.keras.layers.Input(2, dtype=tf.float32)
-    x = tf.keras.layers.Dense(1, activation='sigmoid')(input)
-    model = tf.keras.models.Model(inputs=[input], outputs=[x])
+def get_model(optimizer, loss, metric):
+    x_input = tf.keras.layers.Input(2, dtype=tf.float32)
+    x = tf.keras.layers.Dense(1, activation='sigmoid')(x_input)
+    model = tf.keras.models.Model(inputs=[x_input], outputs=[x])
     model.compile(optimizer=optimizer,
                   loss=loss,
                   metrics=[metric])
