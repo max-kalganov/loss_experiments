@@ -1,11 +1,13 @@
-run_exp.epochs = 10
-run_exp.loss = @tf.keras.losses.BinaryCrossentropy()
+run_exp.epochs = 1000
+run_exp.loss = @tf.keras.losses.MeanSquaredError()
 
 
 get_dataset.w1 = 0.1
 get_dataset.w2 = -0.7
 get_dataset.samples_num = 100
 
+
+tf.keras.optimizers.SGD.learning_rate = 0.003
 get_model.optimizer = @tf.keras.optimizers.SGD()
-get_model.metric = @tf.keras.metrics.BinaryAccuracy()
+get_model.metric = 'accuracy'
 
