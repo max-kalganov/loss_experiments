@@ -8,7 +8,8 @@ get_dataset.w1 = 0.2
 get_dataset.w2 = -0.3
 get_dataset.samples_num = 100
 
-tf.keras.optimizers.SGD.learning_rate = 0.003
+tf.keras.optimizers.SGD.learning_rate = 0.03
 get_model.optimizer = @tf.keras.optimizers.SGD()
-get_model.metric = 'accuracy'
+get_model.metrics = None #'accuracy'
+get_model.kernel_init = [0.15, -0.25]
 
