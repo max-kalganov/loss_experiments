@@ -1,7 +1,7 @@
 run_exp.epochs = 1000
 run_exp.loss = @tf.keras.losses.MeanSquaredError()
 
-visualize_loss.weights_range = (-0.5, 0.5, 0.01)
+visualize_loss.weights_range_tuple = (-1., 1., 0.05)
 
 
 get_dataset.w1 = 0.2

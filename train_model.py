@@ -27,7 +27,8 @@ class PrintLayer(tf.keras.callbacks.Callback):
 
 
 def train_model(x, y, epochs, loss):
-    x_train, x_test, y_train, y_test = x[:(len(x) // 2), :], x[(len(x) // 2):, :], y[:(len(y) // 2)], y[(len(y) // 2):]
+    border = len(x) * 0.7
+    x_train, x_test, y_train, y_test = x[:border, :], x[border:, :], y[:border], y[border:]
 
     model = get_model(loss=loss)
     print(model.summary())
@@ -37,9 +38,9 @@ def train_model(x, y, epochs, loss):
 
 
 @gin.configurable()
-def visualize_loss(x, y, weights_range: Tuple, loss):
+def visualize_loss(x, y, weights_range_tuple: Tuple, loss):
     loss_values = []
-    weights_range = np.arange(*weights_range)
+    weights_range = np.arange(*weights_range_tuple)
     input_values = np.array(list(product(weights_range, weights_range)))
     for w1, w2 in tqdm(input_values):
         model = get_model(loss=loss, kernel_init=[w1, w2])
@@ -54,7 +55,10 @@ def visualize_loss(x, y, weights_range: Tuple, loss):
     fig.update_layout(title='Loss function for different weights', autosize=True,
                       margin=dict(l=65, r=50, b=65, t=90))
 
-    fig.write_html(file=f'data/loss_surface_{weights_range[0]}_{weights_range[1]}_{weights_range[2]}.html')
+    fig.write_html(file=f'data/loss_surface_'
+                        f'{weights_range_tuple[0]}_'
+                        f'{weights_range_tuple[1]}_'
+                        f'{weights_range_tuple[2]}.html')
     fig.show()
 
 
