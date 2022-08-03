@@ -4,7 +4,7 @@ from typing import Optional, List
 import tensorflow as tf
 import gin
 tf.keras.backend.set_floatx('float64')
-
+tf.config.set_soft_device_placement(True)
 
 @gin.configurable()
 def get_model(optimizer, loss, metric, kernel_init: Optional[List[float]] = None):

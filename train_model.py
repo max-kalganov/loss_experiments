@@ -1,19 +1,20 @@
 """Loss function visualization and experiments using config"""
-from itertools import product
-from typing import Tuple
-
-import numpy as np
-
-from data_generator import get_dataset
+import os
 import gin
 import gin.tf
-from model import get_model
-import external_configurables
+import numpy as np
 import tensorflow as tf
-from plotly import graph_objects as go
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
+
 from tqdm import tqdm
+from typing import Tuple
+from itertools import product
+from plotly import graph_objects as go
+
+from model import get_model
+from data_generator import get_dataset
+
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 
 
 class PrintLayer(tf.keras.callbacks.Callback):
@@ -27,8 +28,8 @@ class PrintLayer(tf.keras.callbacks.Callback):
 
 
 def train_model(x, y, epochs, loss):
-    border = len(x) * 0.7
-    x_train, x_test, y_train, y_test = x[:border, :], x[border:, :], y[:border], y[border:]
+    border = int(len(x) * 0.7)
+    x_train, x_test, y_train, y_test = x[:border, :], x[border:, :], y[:border, :], y[border:, :]
 
     model = get_model(loss=loss)
     print(model.summary())
@@ -67,8 +68,8 @@ def visualize_loss(x, y, weights_range_tuple: Tuple, loss):
 def run_exp(epochs: int, loss):
     x, y = get_dataset()
 
-    visualize_loss(x=x, y=y, loss=loss)
-    #model = train_model(x, y, epochs, loss)
+    # visualize_loss(x=x, y=y, loss=loss)
+    model = train_model(x, y, epochs, loss)
 
 
 if __name__ == '__main__':
