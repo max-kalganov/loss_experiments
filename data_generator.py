@@ -15,4 +15,4 @@ def get_dataset(w1: float, w2: float, samples_num: int,
 
     x = np.random.random(size=(samples_num, 2))
     y = key(x[:, 0], x[:, 1], w1, w2)
-    return x, y
+    return x, y.reshape(-1, 1)
