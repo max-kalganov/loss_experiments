@@ -4,6 +4,7 @@ import gin
 import gin.tf
 import numpy as np
 import tensorflow as tf
+import external_configurables
 
 from tqdm import tqdm
 from typing import Tuple
