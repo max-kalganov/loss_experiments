@@ -3,12 +3,13 @@ from typing import Optional, List
 
 import tensorflow as tf
 import gin
+tf.keras.backend.set_floatx('float64')
 
 
 @gin.configurable()
 def get_model(optimizer, loss, metric, kernel_init: Optional[List[float]] = None):
-    x_input = tf.keras.layers.Input(2, dtype=tf.float32)
-    kernel_init = kernel_init if kernel_init is None else tf.constant_initializer(kernel_init)
+    x_input = tf.keras.layers.Input(2, dtype=tf.float64)
+    kernel_init = kernel_init if kernel_init is None else tf.keras.initializers.Constant(kernel_init)
     x = tf.keras.layers.Dense(1,
                               activation='sigmoid',
                               kernel_initializer=kernel_init,
