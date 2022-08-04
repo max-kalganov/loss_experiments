@@ -40,7 +40,7 @@ def train_model(x, y, epochs, loss):
 
 
 @gin.configurable()
-def visualize_loss(x, y, weights_range_tuple: Tuple, loss):
+def visualize_loss(x, y, weights_range_tuple: Tuple, loss, file_name_postfix: str = ""):
     loss_values = []
     weights_range = np.arange(*weights_range_tuple)
     input_values = np.array(list(product(weights_range, weights_range)))
@@ -60,17 +60,23 @@ def visualize_loss(x, y, weights_range_tuple: Tuple, loss):
     fig.write_html(file=f'data/loss_surface_'
                         f'{weights_range_tuple[0]}_'
                         f'{weights_range_tuple[1]}_'
-                        f'{weights_range_tuple[2]}.html')
+                        f'{weights_range_tuple[2]}{file_name_postfix}.html')
     fig.show()
 
+
+def loss_upgrade(loss):
+    def upgraded(y_true, y_pred):
+        loss_value = loss(y_true, y_pred)
+        return tf.math.maximum(tf.math.log(loss_value) + 5, loss_value)
+    return upgraded
 
 
 @gin.configurable()
 def run_exp(epochs: int, loss):
     x, y = get_dataset()
-
-    # visualize_loss(x=x, y=y, loss=loss)
-    model = train_model(x, y, epochs, loss)
+    loss = loss_upgrade(loss)
+    # model = train_model(x, y, epochs, loss)
+    visualize_loss(x=x, y=y, loss=loss, file_name_postfix="_upgraded_log+5_max_loss")
 
 
 if __name__ == '__main__':
