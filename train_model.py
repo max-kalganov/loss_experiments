@@ -1,6 +1,7 @@
 """Loss function visualization and experiments using config"""
 import os
 import gin
+import json
 import gin.tf
 import numpy as np
 import tensorflow as tf
@@ -28,7 +29,8 @@ class PrintLayer(tf.keras.callbacks.Callback):
               f"bias={self.__round(target_layer.bias)}")
 
 
-def train_model(x, y, epochs, loss):
+def train_model(x, y, epochs, loss, exp_num: int = 0):
+    tf.random.set_seed(1)
     border = int(len(x) * 0.7)
     x_train, x_test, y_train, y_test = x[:border, :], x[border:, :], y[:border, :], y[border:, :]
 
@@ -36,6 +38,17 @@ def train_model(x, y, epochs, loss):
     print(model.summary())
 
     model.fit(x_train, y_train, epochs=epochs, validation_data=[x_test, y_test], callbacks=[PrintLayer()])
+
+    res = {
+        "full_dataset_metrics": float(loss(y_true=y, y_pred=model.predict(x)).numpy()),
+        "train_metrics": float(loss(y_true=y_train, y_pred=model.predict(x_train)).numpy()),
+        "test_metrics": float(loss(y_true=y_test, y_pred=model.predict(x_test)).numpy()),
+        "kernel": model.layers[1].kernel.numpy().squeeze().tolist(),
+        "bias": model.layers[1].bias.numpy().squeeze().tolist()
+    }
+    with open(f'data/model_results_{exp_num}.json', 'w') as file:
+        json.dump(res, file)
+
     return model
 
 
@@ -72,11 +85,11 @@ def loss_upgrade(loss):
 
 
 @gin.configurable()
-def run_exp(epochs: int, loss):
+def run_exp(epochs: int, loss, update_loss: bool = False, exp_num: int = 0):
     x, y = get_dataset()
-    loss = loss_upgrade(loss)
-    # model = train_model(x, y, epochs, loss)
-    visualize_loss(x=x, y=y, loss=loss, file_name_postfix="_upgraded_log+5_max_loss")
+    loss = loss_upgrade(loss) if update_loss else loss
+    model = train_model(x, y, epochs, loss, exp_num=exp_num)
+    # visualize_loss(x=x, y=y, loss=loss, file_name_postfix="_upgraded_log+5_max_loss")
 
 
 if __name__ == '__main__':
