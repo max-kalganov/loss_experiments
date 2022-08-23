@@ -1,9 +1,9 @@
-run_exp.epochs = 1000
+run_exp.epochs = 100
 run_exp.loss = @tf.keras.losses.MeanSquaredError()
 run_exp.update_loss = True
 run_exp.exp_num = 10
 
-visualize_loss.weights_range_tuple = (-10., 10., 0.5)
+visualize_loss.weights_range_tuple = (-150., 150., 15.)
 
 
 get_dataset.w1 = 0.2
@@ -13,4 +13,7 @@ get_dataset.samples_num = 100
 tf.keras.optimizers.SGD.learning_rate = 0.003
 get_model.optimizer = @tf.keras.optimizers.SGD()
 get_model.metrics = None #'accuracy'
+
+get_bigger_model.optimizer = @tf.keras.optimizers.SGD()
+get_bigger_model.metrics = None
 

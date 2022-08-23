@@ -5,7 +5,7 @@ import gin
 
 
 def lin_key_function(x1, x2, w1, w2):
-    return 1 / (1 + np.exp(- (w1 * x1 + w2 * x2)))
+    return 1 / (1 + np.exp(- (w1 * x1 + w2 * x2))) * x1 + x2 * x1 * 2 + x2
 
 
 @gin.configurable()

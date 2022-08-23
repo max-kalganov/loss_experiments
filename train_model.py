@@ -12,7 +12,7 @@ from typing import Tuple
 from itertools import product
 from plotly import graph_objects as go
 
-from model import get_model
+from model import get_model, get_bigger_model
 from data_generator import get_dataset
 
 
@@ -24,7 +24,7 @@ class PrintLayer(tf.keras.callbacks.Callback):
         return (val.numpy().squeeze() * 100).round() / 100
 
     def on_epoch_end(self, *args, **kwargs):
-        target_layer = self.model.layers[1]
+        target_layer = self.model.layers[-1]
         print(f"\nkernel={self.__round(target_layer.kernel)}, "
               f"bias={self.__round(target_layer.bias)}")
 
@@ -34,11 +34,12 @@ def train_model(x, y, epochs, loss, exp_num: int = 0):
     border = int(len(x) * 0.7)
     x_train, x_test, y_train, y_test = x[:border, :], x[border:, :], y[:border, :], y[border:, :]
 
-    model = get_model(loss=loss)
+    model = get_bigger_model(loss=loss)
     print(model.summary())
 
     model.fit(x_train, y_train, epochs=epochs, validation_data=[x_test, y_test], callbacks=[PrintLayer()])
 
+    print(f"Evaluate - {model.evaluate(x_test, y_test)}")
     res = {
         "full_dataset_metrics": float(loss(y_true=y, y_pred=model.predict(x)).numpy()),
         "train_metrics": float(loss(y_true=y_train, y_pred=model.predict(x_train)).numpy()),
@@ -58,7 +59,7 @@ def visualize_loss(x, y, weights_range_tuple: Tuple, loss, file_name_postfix: st
     weights_range = np.arange(*weights_range_tuple)
     input_values = np.array(list(product(weights_range, weights_range)))
     for w1, w2 in tqdm(input_values):
-        model = get_model(loss=loss, kernel_init=[w1, w2])
+        model = get_bigger_model(loss=loss, kernel_init=[w1, w2])
         y_pred = model.predict(x, verbose=0)
         loss_values.append(loss(y_true=y, y_pred=y_pred).numpy())
 
@@ -80,7 +81,7 @@ def visualize_loss(x, y, weights_range_tuple: Tuple, loss, file_name_postfix: st
 def loss_upgrade(loss):
     def upgraded(y_true, y_pred):
         loss_value = loss(y_true, y_pred)
-        return tf.math.maximum(tf.math.log(loss_value) + 5, loss_value)
+        return tf.math.exp(loss_value) - 1. # tf.math.log(loss_value) #tf.math.maximum(tf.math.log(loss_value) + 0.1, loss_value)
     return upgraded
 
 
@@ -88,8 +89,8 @@ def loss_upgrade(loss):
 def run_exp(epochs: int, loss, update_loss: bool = False, exp_num: int = 0):
     x, y = get_dataset()
     loss = loss_upgrade(loss) if update_loss else loss
-    model = train_model(x, y, epochs, loss, exp_num=exp_num)
-    # visualize_loss(x=x, y=y, loss=loss, file_name_postfix="_upgraded_log+5_max_loss")
+    # model = train_model(x, y, epochs, loss, exp_num=exp_num)
+    visualize_loss(x=x, y=y, loss=loss, file_name_postfix="_bigger_model")
 
 
 if __name__ == '__main__':
