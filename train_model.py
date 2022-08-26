@@ -30,7 +30,6 @@ class PrintLayer(tf.keras.callbacks.Callback):
 
 
 def train_model(x, y, epochs, loss, exp_num: int = 0):
-    tf.random.set_seed(1)
     border = int(len(x) * 0.7)
     x_train, x_test, y_train, y_test = x[:border, :], x[border:, :], y[:border, :], y[border:, :]
 
@@ -81,7 +80,9 @@ def visualize_loss(x, y, weights_range_tuple: Tuple, loss, file_name_postfix: st
 def loss_upgrade(loss):
     def upgraded(y_true, y_pred):
         loss_value = loss(y_true, y_pred)
-        return tf.math.exp(loss_value) - 1. # tf.math.log(loss_value) #tf.math.maximum(tf.math.log(loss_value) + 0.1, loss_value)
+        with tf.device('/CPU:0'):
+            res = tf.math.exp(loss_value) - 1.
+        return res # tf.math.log(loss_value) #tf.math.maximum(tf.math.log(loss_value) + 0.1, loss_value)
     return upgraded
 
 
@@ -89,8 +90,8 @@ def loss_upgrade(loss):
 def run_exp(epochs: int, loss, update_loss: bool = False, exp_num: int = 0):
     x, y = get_dataset()
     loss = loss_upgrade(loss) if update_loss else loss
-    # model = train_model(x, y, epochs, loss, exp_num=exp_num)
-    visualize_loss(x=x, y=y, loss=loss, file_name_postfix="_bigger_model")
+    model = train_model(x, y, epochs, loss, exp_num=exp_num)
+    # visualize_loss(x=x, y=y, loss=loss, file_name_postfix="_bigger_model")
 
 
 if __name__ == '__main__':

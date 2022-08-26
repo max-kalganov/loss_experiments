@@ -1,4 +1,4 @@
-run_exp.epochs = 100
+run_exp.epochs = 200
 run_exp.loss = @tf.keras.losses.MeanSquaredError()
 run_exp.update_loss = True
 run_exp.exp_num = 10
